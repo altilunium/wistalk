@@ -3,8 +3,10 @@ WikiStalker : Analyze Wikipedia User's Activity
 
 ## How To Use
 `python3 wistalk.py targetWikipediaUsername wikipediaLanguageCode`\
-Supported wikipedia language : `id` (default) and `en` 
-Example : `python3 wistalk.py someUser en`
+Supported wikipedia language : `id` (default) and `en` \
+Example : \
+`python3 wistalk.py someUser en`
+`python3 wistalk.py namaPengguna`
 
 
 ## Screenshot
