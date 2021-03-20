@@ -6,4 +6,4 @@ WikiStalker : Analyze Wikipedia User's Activity
 Supported wikipedia language : `id` (default) and `en` 
 
 ## Screenshot
-![Screenshot2](https://raw.githubusercontent.com/altilunium/wistalk/main/Screenshot%20from%202021-03-20%2021-26-43.png)
+![Screenshot2](https://github.com/altilunium/wistalk/blob/main/Screenshot%20from%202021-03-20%2021-39-21.png?raw=true)
