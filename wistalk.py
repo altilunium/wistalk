@@ -16,7 +16,17 @@ def sizeof_fmt(num, suffix='B'):
 
 
 uname = sys.argv[1]
-url = "https://id.wikipedia.org/w/index.php?title=Istimewa:Kontribusi_pengguna/"+str(uname)+"&dir=prev&limit=500"
+try:
+	subwiki = sys.argv[2]
+except Exception as e:
+	subwiki = 'id'
+
+if subwiki == 'en':
+	url = "https://en.wikipedia.org/w/index.php?title=Special:Contributions/"+str(uname)+"&dir=prev&target=GeoWriter"
+	baseurl = "https://en.wikipedia.org"
+else:
+	url = "https://id.wikipedia.org/w/index.php?title=Istimewa:Kontribusi_pengguna/"+str(uname)+"&dir=prev&limit=500"
+	baseurl = "https://id.wikipedia.org"
 
 stop = False
 wikiarticle = set()
@@ -66,7 +76,7 @@ while not stop:
 
 	try :
 		next_url = next_url.attrs["href"]
-		url = "https://id.wikipedia.org" + next_url
+		url = baseurl + next_url
 	except Exception as e:
 		stop = True
 
