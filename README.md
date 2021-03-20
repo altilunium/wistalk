@@ -1,4 +1,4 @@
-# wistalk
+# wi-stalk
 WikiStalker : Analyze Wikipedia User's Activity
 
 ## How To Use
