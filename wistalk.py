@@ -58,16 +58,46 @@ while not stop:
 	titles_time = soup.find_all("a",{"class":"mw-changeslist-date"})
 	bytescontrib = soup.find_all("span",{"class":"mw-diff-bytes"})
 	next_url = soup.find("a",{"class":"mw-prevlink"})
+	theList = soup.findAll("li",{"data-mw-revid":True})
 
 
+	theList.reverse()
+	for i in theList:
+		c_title = i.find("a",{"class":"mw-contributions-title"})
+		c_time = i.find("a",{"class":"mw-changeslist-date"})
+		c_ctr = i.find("span",{"class":"mw-diff-bytes"})
+		c_diff = i.find("a",{"class":"mw-changeslist-diff"})
+		try:
+			print(c_time.text +" : "+c_title.text + " (" + c_ctr.text +")")
+		except Exception as e:
+			try:
+				print(c_time.text +" : "+c_title.text)
+			except Exception as d:
+				print(c_title.text)
+		try:
+			print(baseurl+c_diff.attrs["href"])
+		except Exception as e:
+			continue
+		print()
+
+	
+
+	'''
 	titles.reverse()
 	titles_time.reverse()
 	counter = 0
+
+	if len(titles) != len(titles_time):
+		nodate = True
 	for i in titles:
-		print(str(titles_time[counter].text)+" : "+str(i.text))
+		if not nodate:
+			print(str(titles_time[counter].text)+" : "+str(i.text))
+		else:
+			print(str(titles_time[counter].text)+" : "+str(i.text))
 		print(baseurl+titles_time[counter].attrs["href"])
 		print()
 		counter += 1
+	'''
 		
 	
 	for i in bytescontrib:
