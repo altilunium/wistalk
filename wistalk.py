@@ -55,13 +55,19 @@ while not stop:
 	soup = BeautifulSoup(actualPayload,'lxml')
 
 	titles = soup.find_all("a",{"class":"mw-contributions-title"})
+	titles_time = soup.find_all("a",{"class":"mw-changeslist-date"})
 	bytescontrib = soup.find_all("span",{"class":"mw-diff-bytes"})
 	next_url = soup.find("a",{"class":"mw-prevlink"})
 
 
-
+	titles.reverse()
+	titles_time.reverse()
+	counter = 0
 	for i in titles:
-		wikiarticle.add(i.text)
+		print(str(titles_time[counter].text)+" : "+str(i.text))
+		print(baseurl+titles_time[counter].attrs["href"])
+		print()
+		counter += 1
 		
 	
 	for i in bytescontrib:
@@ -81,8 +87,11 @@ while not stop:
 		stop = True
 
 
+'''
 for i in wikiarticle:
 	print(i)
+'''
+
 
 print("Addition "+sizeof_fmt(byte_add))
 print("Deletion "+sizeof_fmt(byte_rem))
