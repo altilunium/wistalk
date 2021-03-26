@@ -4,6 +4,7 @@ import requests
 import urllib.parse as urlparse
 from urllib.parse import parse_qs
 import datetime
+import lxml
 
 
 def sizeof_fmt(num, suffix='B'):
