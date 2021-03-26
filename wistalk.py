@@ -33,6 +33,7 @@ wikiarticle = set()
 byte_add = 0
 byte_rem = 0
 stage = 0
+topart = dict()
 
 while not stop:
 
@@ -67,9 +68,19 @@ while not stop:
 		c_time = i.find("a",{"class":"mw-changeslist-date"})
 		c_ctr = i.find("span",{"class":"mw-diff-bytes"})
 		c_diff = i.find("a",{"class":"mw-changeslist-diff"})
+
+
 		try:
-			print(c_time.text +" : "+c_title.text + " (" + c_ctr.text +")")
+			a = c_ctr.text.replace("−","-")
+			a = int(a)
+			if c_title.text not in topart:
+				topart[c_title.text] = a
+			else:
+				topart[c_title.text] += a
+			print(c_time.text +" : "+c_title.text + " (" + c_ctr.text +" / "+str(topart[c_title.text]) +")")
+			
 		except Exception as e:
+			
 			try:
 				print(c_time.text +" : "+c_title.text)
 			except Exception as d:
@@ -77,28 +88,16 @@ while not stop:
 		try:
 			print(baseurl+c_diff.attrs["href"])
 		except Exception as e:
-			continue
+			try:
+				print(baseurl+c_time.attrs["href"]+"  (B)")
+			except Exception as e:
+				continue
 		print()
+
+
 
 	
 
-	'''
-	titles.reverse()
-	titles_time.reverse()
-	counter = 0
-
-	if len(titles) != len(titles_time):
-		nodate = True
-	for i in titles:
-		if not nodate:
-			print(str(titles_time[counter].text)+" : "+str(i.text))
-		else:
-			print(str(titles_time[counter].text)+" : "+str(i.text))
-		print(baseurl+titles_time[counter].attrs["href"])
-		print()
-		counter += 1
-	'''
-		
 	
 	for i in bytescontrib:
 		#print(i.text)
@@ -122,6 +121,10 @@ for i in wikiarticle:
 	print(i)
 '''
 
+
+for i in sorted(topart,key=topart.get,reverse=False):
+	print(str(i) +" : "+ str(topart[i])) 
+print()
 
 print("Addition "+sizeof_fmt(byte_add))
 print("Deletion "+sizeof_fmt(byte_rem))
