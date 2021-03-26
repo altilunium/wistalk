@@ -1,6 +1,9 @@
 # wi-stalk
 WikiStalker : Analyze Wikipedia User's Activity
 
+## Live Demo
+https://replit.com/@rtnf141/wistalk
+
 ## How To Use
 `python3 wistalk.py targetWikipediaUsername wikipediaLanguageCode`\
 Supported wikipedia language : `id` (default) and `en` \
