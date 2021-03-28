@@ -5,6 +5,7 @@ import urllib.parse as urlparse
 from urllib.parse import parse_qs
 import datetime
 import lxml
+import signal
 
 
 def sizeof_fmt(num, suffix='B'):
@@ -17,117 +18,150 @@ def sizeof_fmt(num, suffix='B'):
 
 
 uname = sys.argv[1]
-try:
-	subwiki = sys.argv[2]
-except Exception as e:
-	subwiki = 'id'
 
-if subwiki == 'en':
-	url = "https://en.wikipedia.org/w/index.php?title=Special:Contributions/"+str(uname)+"&dir=prev&target=GeoWriter"
-	baseurl = "https://en.wikipedia.org"
+
+if uname == "-i":
+	print("https://YY.wikipedia.org/wiki/User:XXXX")
+	uname = input("Enter Wikipedia Username (XXXX) : ")
+	subwiki = input("Enter Wikipedia Language (en/id) : ")
+	iloop = True
 else:
-	url = "https://id.wikipedia.org/w/index.php?title=Istimewa:Kontribusi_pengguna/"+str(uname)+"&dir=prev&limit=500"
-	baseurl = "https://id.wikipedia.org"
-
-stop = False
-wikiarticle = set()
-byte_add = 0
-byte_rem = 0
-stage = 0
+	iloop = False
+	try:
+		subwiki = sys.argv[2]
+	except Exception as e:
+		subwiki = 'id'
+stillOn = True
 topart = dict()
 
-while not stop:
-
-	stage += 500
-	#print("Edit count : "+str(stage))
-
-	parsed = urlparse.urlparse(url)
-	try:
-		x = parse_qs(parsed.query)['offset']
-		dobj = datetime.datetime.strptime(x[0],'%Y%m%d%H%M%S')
-		print(str(dobj) + "   " +str(stage) +" [+"+sizeof_fmt(byte_add)+"] ["+sizeof_fmt(byte_rem)+"]" )
-	except Exception as e:
-		None
+def signal_handler(sig,frame):
+	for i in sorted(topart,key=topart.get,reverse=False):
+		print(str(i) +" : "+ str(topart[i])) 
+	print()
+	sys.exit(0)
 
 
-	#print(url)
-	actualPayload = bytearray()
-	response = requests.get(url)
-	actualPayload = response.text
-	soup = BeautifulSoup(actualPayload,'lxml')
 
-	titles = soup.find_all("a",{"class":"mw-contributions-title"})
-	titles_time = soup.find_all("a",{"class":"mw-changeslist-date"})
-	bytescontrib = soup.find_all("span",{"class":"mw-diff-bytes"})
-	next_url = soup.find("a",{"class":"mw-prevlink"})
-	theList = soup.findAll("li",{"data-mw-revid":True})
+signal.signal(signal.SIGINT,signal_handler)
+while stillOn:
+	if subwiki == 'en':
+		url = "https://en.wikipedia.org/w/index.php?title=Special:Contributions/"+str(uname)+"&dir=prev&limit=5000"
+		baseurl = "https://en.wikipedia.org"
+	else:
+		url = "https://id.wikipedia.org/w/index.php?title=Istimewa:Kontribusi_pengguna/"+str(uname)+"&dir=prev&limit=5000"
+		baseurl = "https://id.wikipedia.org"
 
+	stop = False
+	wikiarticle = set()
+	byte_add = 0
+	byte_rem = 0
+	stage = 0
+	topart = dict()
 
-	theList.reverse()
-	for i in theList:
-		c_title = i.find("a",{"class":"mw-contributions-title"})
-		c_time = i.find("a",{"class":"mw-changeslist-date"})
-		c_ctr = i.find("span",{"class":"mw-diff-bytes"})
-		c_diff = i.find("a",{"class":"mw-changeslist-diff"})
+	while not stop:
 
+		stage += 500
+		#print("Edit count : "+str(stage))
 
+		parsed = urlparse.urlparse(url)
 		try:
-			a = c_ctr.text.replace("−","-")
-			a = int(a)
-			if c_title.text not in topart:
-				topart[c_title.text] = a
-			else:
-				topart[c_title.text] += a
-			print(c_time.text +" : "+c_title.text + " (" + c_ctr.text +" / "+str(topart[c_title.text]) +")")
-			
+			x = parse_qs(parsed.query)['offset']
+			dobj = datetime.datetime.strptime(x[0],'%Y%m%d%H%M%S')
+			print(str(dobj) + "   " +str(stage) +" [+"+sizeof_fmt(byte_add)+"] ["+sizeof_fmt(byte_rem)+"]" )
 		except Exception as e:
-			
+			None
+
+
+		#print(url)
+		actualPayload = bytearray()
+		response = requests.get(url)
+		actualPayload = response.text
+		soup = BeautifulSoup(actualPayload,'lxml')
+
+		titles = soup.find_all("a",{"class":"mw-contributions-title"})
+		titles_time = soup.find_all("a",{"class":"mw-changeslist-date"})
+		bytescontrib = soup.find_all("span",{"class":"mw-diff-bytes"})
+		next_url = soup.find("a",{"class":"mw-prevlink"})
+		theList = soup.findAll("li",{"data-mw-revid":True})
+
+
+		theList.reverse()
+		for i in theList:
+			c_title = i.find("a",{"class":"mw-contributions-title"})
+			c_time = i.find("a",{"class":"mw-changeslist-date"})
+			c_ctr = i.find("span",{"class":"mw-diff-bytes"})
+			c_ctrX = i.find("strong",{"class":"mw-diff-bytes"})
+			c_diff = i.find("a",{"class":"mw-changeslist-diff"})
+
+
 			try:
-				print(c_time.text +" : "+c_title.text)
-			except Exception as d:
-				print(c_title.text)
-		try:
-			print(baseurl+c_diff.attrs["href"])
-		except Exception as e:
-			try:
-				print(baseurl+c_time.attrs["href"]+"  (B)")
+				if c_ctr is None:
+					c_ctr = c_ctrX
+				a = c_ctr.text.replace("−","-")
+				a = c_ctr.text.replace(".","")
+				a = int(a)
+				if c_title.text not in topart:
+					topart[c_title.text] = a
+				else:
+					topart[c_title.text] += a
+				print(c_time.text +" : "+c_title.text + " (" + c_ctr.text +" / "+str(topart[c_title.text]) +")")
+				
 			except Exception as e:
-				continue
+				
+				try:
+					print(c_time.text +" : "+c_title.text)
+				except Exception as d:
+					print(c_title.text)
+			try:
+				print(baseurl+c_diff.attrs["href"])
+			except Exception as e:
+				try:
+					print(baseurl+c_time.attrs["href"]+"  (B)")
+				except Exception as e:
+					continue
+			print()
+
+
+
+		
+
+		
+		for i in bytescontrib:
+			#print(i.text)
+			a = i.text.replace("−","-")
+			contrib = int(a)
+			if contrib >= 0:
+				byte_add += contrib
+			else:
+				byte_rem += contrib
+
+
+		try :
+			next_url = next_url.attrs["href"]
+			url = baseurl + next_url
+		except Exception as e:
+			stop = True
+
+
+	'''
+	for i in wikiarticle:
+		print(i)
+	'''
+
+
+	for i in sorted(topart,key=topart.get,reverse=False):
+		print(str(i) +" : "+ str(topart[i])) 
+	print()
+
+	print("Addition "+sizeof_fmt(byte_add))
+	print("Deletion "+sizeof_fmt(byte_rem))
+
+	if iloop:
 		print()
-
-
-
-	
-
-	
-	for i in bytescontrib:
-		#print(i.text)
-		a = i.text.replace("−","-")
-		contrib = int(a)
-		if contrib >= 0:
-			byte_add += contrib
-		else:
-			byte_rem += contrib
-
-
-	try :
-		next_url = next_url.attrs["href"]
-		url = baseurl + next_url
-	except Exception as e:
-		stop = True
-
-
-'''
-for i in wikiarticle:
-	print(i)
-'''
-
-
-for i in sorted(topart,key=topart.get,reverse=False):
-	print(str(i) +" : "+ str(topart[i])) 
-print()
-
-print("Addition "+sizeof_fmt(byte_add))
-print("Deletion "+sizeof_fmt(byte_rem))
+		print("https://YY.wikipedia.org/wiki/User:XXXX")
+		uname = input("Enter Wikipedia Username (XXXX) : ")
+		subwiki = input("Enter Wikipedia Language (en/id) : ")
+	else:
+		stillOn = False	
 
 
