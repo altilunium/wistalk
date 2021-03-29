@@ -1,5 +1,5 @@
 # wi-stalk
-WikiStalker : Analyze Wikipedia User's Activity
+WikiStalk : Analyze Wikipedia User's Activity
 
 ## Live Demo
 https://replit.com/@rtnf141/wistalk
