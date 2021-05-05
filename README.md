@@ -19,8 +19,8 @@ Example : \
 
 ### Update
 Now you can directly query to Wikipedia's database to analyze wikipedia user's activity (https://quarry.wmflabs.org/query/54771). It's much faster this way.
-*Create a Wikipedia account
-*Log in to Quarry
-*Fork that SQL query
-*Change the target variable with target username
-*Submit query
+* Create a Wikipedia account
+* Log in to Quarry
+* Fork that SQL query
+* Change the target variable with target username
+* Submit query
