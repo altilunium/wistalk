@@ -22,8 +22,8 @@ Example : \
 `pip install lxml`
 
 
-### Update
-Now you can directly query to Wikipedia's database to analyze wikipedia user's activity (https://quarry.wmflabs.org/query/54771). It's much faster this way.
+### Update : Wistalk2
+Now you can directly query to Wikipedia's database to analyze wikipedia user's activity (https://quarry.wmcloud.org/query/59144). It's much faster this way.
 * Create a Wikipedia account
 * Log in to Quarry
 * Fork that SQL query
