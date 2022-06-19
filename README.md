@@ -5,6 +5,8 @@ WikiStalk : Analyze Wikipedia User's Activity
 https://replit.com/@rtnf141/wistalk
 
 ## How To Use
+`pip install beautifulsoup4`
+`pip install lxml`
 `python3 wistalk.py targetWikipediaUsername wikipediaLanguageCode`\
 Supported wikipedia language : `id` (default) and `en` \
 Example : \
